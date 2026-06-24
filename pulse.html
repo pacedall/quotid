@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Pulse · Quotid Arcade</title>
+<link rel="icon" type="image/png" href="quotid-favicon.png">
+<script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('quotid_theme')||'light')}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#F6F4EE;--card:#FFFFFF;--ink:#26313F;--muted:#79838B;--line:#E8E3D8;--ac:#C23B2E;--btnbg:#fff;--field:#F3F0E8}
+  html[data-theme="dark"]{--bg:#161B24;--card:#1F2630;--ink:#F3EFE6;--muted:#9AA3B1;--line:rgba(243,239,230,.12);--btnbg:#1F2630;--field:#10151D}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{background:var(--bg);color:var(--ink);font-family:'Nunito',system-ui,sans-serif;font-variant-numeric:tabular-nums;
+    min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:16px;overflow:hidden}
+  .bar{width:100%;max-width:560px;display:flex;align-items:center;gap:12px;margin-bottom:14px}
+  .back{font-family:'Fredoka';font-weight:600;font-size:14px;color:var(--muted);text-decoration:none;
+    border:1px solid var(--line);border-radius:10px;padding:8px 12px;background:var(--card)}
+  .title{font-family:'Fredoka';font-weight:700;font-size:22px}.title .d{color:var(--ac)}
+  .themebtn{margin-left:auto;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--btnbg);
+    color:var(--ink);display:flex;align-items:center;justify-content:center;cursor:pointer}
+  .themebtn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .hud{width:100%;max-width:560px;display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;
+    font-family:'Fredoka';font-weight:600}
+  .hud .s{font-size:15px;color:var(--muted)}.hud .s b{color:var(--ink);font-size:22px;margin-left:4px}
+  .lives{display:flex;gap:6px}.lives i{width:11px;height:11px;border-radius:50%;background:var(--ac);display:block}
+  .lives i.off{background:var(--line)}
+  .stage{position:relative;width:100%;max-width:560px;aspect-ratio:1;background:var(--card);border:1px solid var(--line);
+    border-radius:22px;overflow:hidden;box-shadow:0 18px 50px -28px rgba(90,60,30,.5);touch-action:none}
+  canvas{position:absolute;inset:0;width:100%;height:100%}
+  .ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;padding:28px;background:color-mix(in srgb,var(--card) 82%,transparent);backdrop-filter:blur(2px)}
+  .ov[hidden]{display:none}
+  .ov h2{font-family:'Fredoka';font-weight:700;font-size:30px;margin-bottom:8px}
+  .ov p{color:var(--muted);font-size:15px;line-height:1.5;max-width:300px;margin-bottom:20px}
+  .ov .big{font-family:'Fredoka';font-weight:700;font-size:60px;color:var(--ac);line-height:1}
+  .ov .sub{font-family:'Fredoka';color:var(--muted);font-size:14px;margin:6px 0 20px}
+  .btn{font-family:'Fredoka';font-weight:600;font-size:17px;padding:14px 28px;border:none;border-radius:13px;
+    background:var(--ac);color:#fff;cursor:pointer}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+  <div class="bar">
+    <a class="back" href="quotid-arcade.html">← Arcade</a>
+    <div class="title">Pulse<span class="d">.</span></div>
+    <button class="themebtn" id="themeBtn" aria-label="Theme"></button>
+  </div>
+  <div class="hud">
+    <div class="s">SCORE<b id="score">0</b></div>
+    <div class="lives" id="lives"></div>
+    <div class="s">BEST<b id="best">0</b></div>
+  </div>
+  <div class="stage" id="stage">
+    <canvas id="c"></canvas>
+    <div class="ov" id="ov">
+      <h2>Pulse</h2>
+      <p>A dot races around the ring. Tap the moment it crosses the bright arc. Miss three and it's over.</p>
+      <button class="btn" id="startBtn">Tap to start</button>
+    </div>
+  </div>
+<script>
+  const SUN='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/></svg>';
+  const MOON='<svg viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1111.2 3a6.6 6.6 0 009.8 9.8z"/></svg>';
+  const tb=document.getElementById('themeBtn');
+  function setTheme(t){document.documentElement.setAttribute('data-theme',t);tb.innerHTML=t==='dark'?SUN:MOON;try{localStorage.setItem('quotid_theme',t)}catch(e){}}
+  (function(){let t;try{t=localStorage.getItem('quotid_theme')}catch(e){}setTheme(t||'light')})();
+  tb.onclick=()=>setTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');
+
+  const cv=document.getElementById('c'), ctx=cv.getContext('2d');
+  const stage=document.getElementById('stage'), ov=document.getElementById('ov');
+  let W=0,H=0,DPR=Math.min(devicePixelRatio||1,2);
+  function resize(){const r=stage.getBoundingClientRect();W=r.width;H=r.height;cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);}
+  new ResizeObserver(resize).observe(stage); resize();
+
+  const css=k=>getComputedStyle(document.documentElement).getPropertyValue(k).trim();
+  let state='ready', score=0, best=0, lives=3;
+  let ang=0, dir=1, speed=2.4, targetA=Math.PI, arcHalf=0.55, flash=0, flashCol='#fff', last=0;
+
+  function reset(){score=0;lives=3;speed=2.4;arcHalf=0.55;ang=0;dir=1;newTarget();updateHud();}
+  function newTarget(){let t;do{t=Math.random()*Math.PI*2}while(Math.abs(((t-ang+Math.PI)%(Math.PI*2))-Math.PI)<arcHalf+0.6);targetA=t;dir=Math.random()<.5?1:-1;}
+  function updateHud(){document.getElementById('score').textContent=score;document.getElementById('best').textContent=best;
+    const l=document.getElementById('lives');l.innerHTML='';for(let i=0;i<3;i++){const d=document.createElement('i');if(i>=lives)d.className='off';l.appendChild(d);}}
+
+  function tap(){
+    if(state==='ready'||state==='over'){start();return;}
+    let d=Math.abs(((ang-targetA+Math.PI)%(Math.PI*2)+Math.PI*2)%(Math.PI*2)-Math.PI);
+    if(d<=arcHalf){score++;flash=1;flashCol=css('--ac');speed=Math.min(7,speed+0.12);arcHalf=Math.max(0.2,arcHalf*0.975);newTarget();updateHud();}
+    else{lives--;flash=1;flashCol='#888';updateHud();if(lives<=0)over();}
+  }
+  function start(){state='play';reset();ov.hidden=true;last=performance.now();}
+  function over(){state='over';best=Math.max(best,score);
+    ov.innerHTML=`<div class="big">${score}</div><div class="sub">best ${best}</div>
+      <button class="btn" id="startBtn">Tap to retry</button>`;
+    ov.hidden=false;ov.querySelector('#startBtn').onclick=start;updateHud();}
+
+  function loop(t){
+    const dt=Math.min(.05,(t-last)/1000);last=t;
+    if(state==='play'){ang=(ang+dir*speed*dt)%(Math.PI*2);if(ang<0)ang+=Math.PI*2;}
+    draw();requestAnimationFrame(loop);
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    const cx=W/2,cy=H/2,R=Math.min(W,H)*0.34;
+    ctx.lineCap='round';
+    // base ring
+    ctx.strokeStyle=css('--line');ctx.lineWidth=R*0.14;ctx.beginPath();ctx.arc(cx,cy,R,0,Math.PI*2);ctx.stroke();
+    // target arc
+    ctx.strokeStyle=css('--ac');ctx.lineWidth=R*0.14;ctx.beginPath();ctx.arc(cx,cy,R,targetA-arcHalf,targetA+arcHalf);ctx.stroke();
+    // marker
+    const mx=cx+Math.cos(ang)*R,my=cy+Math.sin(ang)*R;
+    ctx.fillStyle=css('--ink');ctx.beginPath();ctx.arc(mx,my,R*0.12,0,Math.PI*2);ctx.fill();
+    // flash
+    if(flash>0){ctx.globalAlpha=flash*0.5;ctx.fillStyle=flashCol;ctx.beginPath();ctx.arc(cx,cy,R*0.55,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;flash=Math.max(0,flash-0.06);}
+    // center score
+    ctx.fillStyle=css('--muted');ctx.font=`600 ${R*0.3}px Fredoka, sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(state==='play'?score:'', cx, cy);
+  }
+  document.getElementById('startBtn').onclick=start;
+  stage.addEventListener('pointerdown',e=>{e.preventDefault();tap();});
+  addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();tap();}});
+  updateHud();requestAnimationFrame(loop);
+</script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quotid Arcade — play anytime</title>
+<link rel="icon" type="image/png" href="quotid-favicon.png">
+<script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('quotid_theme')||'light')}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F6F4EE; --card:#FFFFFF; --card-2:#FCFBF7;
+    --ink:#26313F; --muted:#79838B; --line:#E8E3D8;
+    --orange:#E07C3A; --red:#C23B2E; --teal:#3F9E8E; --gold:#D99A3C; --indigo:#3C6E9C;
+    --btnbg:#FFFFFF;
+  }
+  html[data-theme="dark"]{
+    --bg:#161B24; --card:#1F2630; --card-2:#252E39;
+    --ink:#F3EFE6; --muted:#9AA3B1; --line:rgba(243,239,230,.10); --btnbg:#1F2630;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:'Nunito',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums;min-height:100vh;padding:26px 20px 50px;
+    background-image:radial-gradient(circle at 8% -8%,rgba(245,144,26,.10),transparent 42%),
+      radial-gradient(circle at 92% -8%,rgba(110,111,221,.10),transparent 42%);}
+  html[data-theme="dark"] body{background-image:radial-gradient(circle at 8% -8%,rgba(245,144,26,.12),transparent 42%),
+      radial-gradient(circle at 92% -8%,rgba(30,175,158,.12),transparent 42%);}
+  .wrap{max-width:920px;margin:0 auto}
+
+  header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:8px}
+  .brand{font-family:'Fredoka';font-weight:700;font-size:42px;line-height:1;letter-spacing:-.005em}
+  .brand .q{color:var(--red)} .brand .u{color:var(--gold)}
+  .brand small{display:block;font-family:'Fredoka';font-weight:600;font-size:15px;color:var(--muted);letter-spacing:.32em;text-transform:uppercase;margin-top:8px}
+  .brandwrap{display:flex;align-items:flex-end;gap:12px}.logo{height:58px;width:auto}
+  .arcadetag{font-family:'Fredoka';font-weight:600;font-size:15px;color:var(--muted);letter-spacing:.3em;text-transform:uppercase;padding-bottom:6px}
+  html[data-theme="dark"] .logo{background:#fff;border-radius:12px;padding:7px 10px}
+  .themebtn{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--btnbg);
+    color:var(--ink);display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;
+    box-shadow:0 8px 20px -12px rgba(90,70,40,.4)}
+  .themebtn:active{transform:scale(.94)}
+  .themebtn svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+  .intro{font-size:16px;color:var(--muted);line-height:1.55;max-width:600px;margin:18px 0 22px}
+  .intro b{color:var(--ink);font-weight:700}
+
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
+  .pill{font-family:'Fredoka';font-weight:600;font-size:14px;padding:9px 16px;border-radius:999px;
+    border:1px solid var(--line);background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s}
+  .pill.active{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media (max-width:780px){.grid{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width:520px){.grid{grid-template-columns:1fr}}
+  .card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:18px;
+    padding:18px 18px 16px;overflow:hidden;cursor:pointer;text-decoration:none;color:inherit;
+    box-shadow:0 10px 26px -18px rgba(90,70,40,.35);transition:transform .14s cubic-bezier(.2,.8,.2,1),box-shadow .2s,border-color .2s}
+  .card:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--ac) 55%,var(--line));
+    box-shadow:0 20px 38px -22px rgba(90,70,40,.5)}
+  .cab{width:54px;height:54px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+    font-family:'Fredoka';font-weight:700;font-size:24px;color:#fff;margin-bottom:14px;
+    background:var(--ac);box-shadow:0 6px 16px -6px var(--ac)}
+  .cname{font-family:'Fredoka';font-weight:700;font-size:19px;letter-spacing:-.005em}
+  .ctag{font-size:13px;color:var(--muted);line-height:1.4;margin:4px 0 14px;min-height:36px}
+  .crow{display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid var(--line)}
+  .cat{font-family:'Fredoka';font-weight:600;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ac)}
+  .soon{font-family:'Fredoka';font-weight:600;font-size:11px;color:var(--muted);
+    border:1px solid var(--line);border-radius:6px;padding:3px 8px;letter-spacing:.04em}
+
+  .note{margin-top:30px;padding:16px 18px;border:1px dashed var(--line);border-radius:14px;
+    font-size:13.5px;color:var(--muted);line-height:1.55;background:var(--card-2)}
+  .note b{color:var(--ink);font-weight:700}
+  footer{text-align:center;margin-top:26px;color:var(--muted);font-size:13px}
+  footer a{color:inherit}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brandwrap"><img class="logo" src="quotid-games-logo.png" alt="Quotid Games"><span class="arcadetag">Arcade</span></div>
+    <button class="themebtn" id="themeBtn" aria-label="Switch theme"></button>
+  </header>
+
+  <p class="intro">A <b>play-anytime</b> corner alongside the daily puzzles — quick, original arcade games, free in your browser. No clones, no trademarks: every title here is its own thing.</p>
+
+  <div class="filters" id="filters"></div>
+  <div class="grid" id="grid"></div>
+
+  <div class="note">
+    <b>Phase 1 — four original games, live.</b> Pulse, Orbit, Sift and Recall are built from scratch with original mechanics and art — no clones, no trademarked ideas. Tap a coloured card to play. The greyed-out titles are concepts for later phases.
+  </div>
+  <footer><a href="/privacy">Privacy</a> · Pacedall Labs</footer>
+</div>
+
+<script>
+  // theme
+  const SUN='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/></svg>';
+  const MOON='<svg viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1111.2 3a6.6 6.6 0 009.8 9.8z"/></svg>';
+  const tb=document.getElementById('themeBtn');
+  function setTheme(t){document.documentElement.setAttribute('data-theme',t);tb.innerHTML=t==='dark'?SUN:MOON;try{localStorage.setItem('quotid_theme',t)}catch(e){}}
+  (function(){let t;try{t=localStorage.getItem('quotid_theme')}catch(e){}setTheme(t||'light')})();
+  tb.onclick=()=>setTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');
+
+  // original, non-trademarked re-imaginings of the old arcade list
+  const GAMES=[
+    {n:'Pulse', i:'P', cat:'reflex',   ac:'var(--red)',    href:'pulse.html',  live:true,  t:'Tap the instant the dot crosses the bright arc.'},
+    {n:'Orbit', i:'O', cat:'dodge',    ac:'var(--teal)',   href:'orbit.html',  live:true,  t:'Hop between two rings to dodge and collect.'},
+    {n:'Sift',  i:'S', cat:'reaction', ac:'var(--indigo)', href:'sift.html',   live:true,  t:'Match the falling colour before it lands.'},
+    {n:'Recall',i:'R', cat:'memory',   ac:'var(--gold)',   href:'recall.html', live:true,  t:'Memorise the lit tiles, then tap them back.'},
+    {n:'Driftbreak', i:'D', cat:'dodge',    ac:'var(--orange)', live:false, t:'Spin and thrust through a drifting field.'},
+    {n:'Lane Leap',  i:'L', cat:'reflex',   ac:'var(--teal)',   live:false, t:'Time every hop across a busy road.'},
+    {n:'Rally',      i:'Y', cat:'reflex',   ac:'var(--red)',    live:false, t:'A pure two-paddle duel of reflexes.'},
+    {n:'Swarm',      i:'W', cat:'reaction', ac:'var(--indigo)', live:false, t:'Read the diving formation and break it.'}
+  ];
+  const CATS=[['all','All'],['reflex','Reflex'],['dodge','Dodge'],['reaction','Reaction'],['memory','Memory']];
+  let active='all';
+
+  const filters=document.getElementById('filters');
+  filters.innerHTML=CATS.map(([k,l])=>`<button class="pill ${k==='all'?'active':''}" data-k="${k}">${l}</button>`).join('');
+  filters.onclick=e=>{const b=e.target.closest('.pill');if(!b)return;active=b.dataset.k;
+    [...filters.children].forEach(p=>p.classList.toggle('active',p.dataset.k===active));render();};
+
+  function render(){
+    const list=GAMES.filter(g=>active==='all'||g.cat===active);
+    document.getElementById('grid').innerHTML=list.map(g=>`
+      <a class="card" style="--ac:${g.ac}" href="${g.live?g.href:'#'}" ${g.live?'':'onclick="return false"'}>
+        <div class="cab">${g.i}</div>
+        <div class="cname">${g.n}</div>
+        <div class="ctag">${g.t}</div>
+        <div class="crow"><span class="cat">${g.cat}</span>${g.live?'<span class="cat" style="color:var(--ac)">PLAY →</span>':'<span class="soon">SOON</span>'}</div>
+      </a>`).join('');
+  }
+  render();
+</script>
+</body>
+</html>

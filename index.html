@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="quotid-favicon.png">
 <!-- Start cookieyes banner -->
 <script id="cookieyes" type="text/javascript" src="https://cdn-cookieyes.com/client_data/90fad395248989c1d7f54ba84a823561/script.js"></script>
 <!-- End cookieyes banner -->
@@ -12,10 +13,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#FDF5DA; --card:#FFFFFF; --card-2:#FFFDF6;
-    --ink:#1C222E; --muted:#79808E; --line:#EBE2CB;
-    --era:#F5901A; --closer:#E8393E; --pinpoint:#1EAF9E; --ten:#F5AE18;
-    --flame:#F29D39;
+    --bg:#F6F4EE; --card:#FFFFFF; --card-2:#FCFBF7;
+    --ink:#26313F; --muted:#79838B; --line:#E8E3D8;
+    --era:#E07C3A; --closer:#C23B2E; --pinpoint:#3F9E8E; --ten:#D99A3C;
+    --flame:#E07C3A;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
@@ -31,6 +32,8 @@
 
   header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:6px}
   .brand{font-family:'Fredoka';font-weight:700;font-size:46px;letter-spacing:-.005em;line-height:1}
+  .logo{height:64px;width:auto;display:block}
+  html[data-theme="dark"] .logobox{background:#fff;border-radius:14px;padding:9px 14px;display:inline-block;box-shadow:0 8px 22px -10px rgba(0,0,0,.55)}
   .brand .q{color:var(--closer)}
   .brand .u{color:var(--flame)}
   .tag{font-family:'Nunito';font-size:13px;letter-spacing:.16em;text-transform:uppercase;
@@ -97,10 +100,10 @@
 
   .thumb{height:42px;margin:2px 0 16px;position:relative}
   .tline{position:absolute;top:50%;left:0;right:0;height:2px;background:var(--line);border-radius:2px}
-  .ttick{position:absolute;top:calc(50% - 5px);width:1px;height:10px;background:#D9CFC2}
+  .ttick{position:absolute;top:calc(50% - 5px);width:1px;height:10px;background:#CFC8BA}
   .tdot{position:absolute;top:50%;width:12px;height:12px;border-radius:50%;transform:translate(-50%,-50%);background:var(--ac)}
   .grad{position:absolute;top:50%;left:0;right:0;height:3px;transform:translateY(-50%);border-radius:3px;
-    background:linear-gradient(90deg,#5AA6E0,#5FC4C4,#EDB94A,#E2734E)}
+    background:linear-gradient(90deg,#5AA6E0,#5FC4C4,#EDB94A,#C23B2E)}
   .gdot{position:absolute;top:50%;width:10px;height:10px;border-radius:50%;transform:translate(-50%,-50%);border:2px solid var(--card)}
   .cross{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:42px;height:42px;
     border:2px solid var(--ac);border-radius:50%;opacity:.55}
@@ -137,7 +140,7 @@
   .dialog h3{font-family:'Fredoka';font-weight:700;font-size:23px;margin-bottom:8px}
   .dialog p{font-size:14px;color:var(--muted);line-height:1.5;margin-bottom:18px}
   .dialog input{width:100%;padding:14px;border-radius:11px;border:1px solid var(--line);
-    background:#FDFAF6;color:var(--ink);font-family:'Nunito';font-size:15px}
+    background:#FCFBF7;color:var(--ink);font-family:'Nunito';font-size:15px}
   .dialog input:focus{outline:none;border-color:var(--flame)}
   .dialog .go{width:100%;margin-top:12px;padding:15px;border:none;border-radius:12px;background:var(--flame);
     color:#fff;font-family:'Fredoka';font-weight:600;font-size:16px;cursor:pointer}
@@ -177,7 +180,7 @@
 <div class="wrap">
   <header>
     <div>
-      <div class="brand"><span class="q">Q</span><span class="u">u</span>otid</div>
+      <div class="logobox"><img class="logo" src="quotid-games-logo.png" alt="Quotid Games"></div>
       <div class="tag">A puzzle a day · quotidgames.com</div>
       <div class="live"><span class="livedot"></span><b id="liveN">—</b>&nbsp;playing right now</div>
     </div>
@@ -268,7 +271,7 @@ function thumbHTML(t){
     [12,34,56,78].forEach(p=>h+=`<div class="ttick" style="left:${p}%"></div>`);
     return h+'<div class="tdot" style="left:62%"></div>';}
   if(t==='closer'){let h='<div class="grad"></div>';
-    [[20,'#5AA6E0'],[44,'#5FC4C4'],[68,'#EDB94A'],[82,'#E2734E']].forEach(([p,c])=>h+=`<div class="gdot" style="left:${p}%;background:${c}"></div>`);
+    [[20,'#5AA6E0'],[44,'#5FC4C4'],[68,'#EDB94A'],[82,'#C23B2E']].forEach(([p,c])=>h+=`<div class="gdot" style="left:${p}%;background:${c}"></div>`);
     return h;}
   if(t==='pinpoint')return '<div class="cross"></div><div class="pin"></div>';
   if(t==='ten')return `<div class="tiles"><div class="tile">7</div><div class="tile">3</div><div class="tile">9</div><div class="tile">·</div><div class="tile t">24</div></div>`;
