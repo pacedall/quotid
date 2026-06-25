@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Start cookieyes banner -->
+<script id="cookieyes" type="text/javascript" src="https://cdn-cookieyes.com/client_data/90fad395248989c1d7f54ba84a823561/script.js"></script>
+<!-- End cookieyes banner -->
+<script defer data-domain="quotidgames.com" src="https://plausible.io/js/script.js"></script>
+<title>Privacy · Quotid</title>
+<link rel="icon" type="image/png" href="images/quotid-favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#F6F4EE;--card:#fff;--ink:#26313F;--muted:#79838B;--line:#E8E3D8;--red:#C23B2E}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:'Nunito',system-ui,sans-serif;
+    line-height:1.6;padding:32px 20px 60px}
+  .wrap{max-width:680px;margin:0 auto}
+  h1{font-family:'Fredoka';font-weight:700;font-size:32px;margin-bottom:6px}
+  .sub{color:var(--muted);font-size:14px;margin-bottom:28px}
+  h2{font-family:'Fredoka';font-weight:600;font-size:19px;margin:26px 0 8px}
+  p,li{font-size:15px;color:#3a3f49}
+  ul{margin:6px 0 6px 20px}
+  a{color:var(--red);font-weight:600;text-decoration:none}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;margin-top:24px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  button{border:none;border-radius:11px;padding:12px 18px;font-family:'Fredoka';font-weight:600;
+    font-size:15px;cursor:pointer}
+  .export{background:var(--ink);color:#fff}
+  .delete{background:var(--red);color:#fff}
+  .ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+  .note{font-size:13px;color:var(--muted);margin-top:12px;min-height:16px}
+  .back{display:inline-block;margin-bottom:20px}
+  .muted-box{font-size:13px;color:var(--muted);background:#F3F0E8;border:1px solid var(--line);
+    border-radius:10px;padding:12px;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← Quotid</a>
+  <h1>Privacy</h1>
+  <div class="sub">Last updated: <span id="date"></span> · This is a starting template — have it reviewed before relying on it.</div>
+
+  <p>Quotid is a daily puzzle site operated by Pacedall Labs. This page explains what we collect and the choices you have. Questions: <a href="mailto:team@pacedall.com">team@pacedall.com</a>.</p>
+
+  <h2>What we collect</h2>
+  <ul>
+    <li><b>If you create an account:</b> your email address, a securely hashed password (never stored in plain text), and your puzzle play history (dates, scores, streaks).</li>
+    <li><b>If you play without an account:</b> your progress is stored only in your own browser — we don't receive it.</li>
+    <li><b>Analytics:</b> we use Plausible, a privacy-friendly, cookieless analytics tool that records aggregate visits only. It does not track you across sites or build a profile.</li>
+    <li><b>Cookies:</b> managed via the consent banner. We keep these to a minimum.</li>
+  </ul>
+
+  <h2>Why, and our legal basis</h2>
+  <p>We use your email to run your account, secure it (verification, password reset), and — only if you leave reminders on — to let you know a new puzzle is ready. The legal basis is performance of our service to you and your consent for reminders, which you can withdraw at any time.</p>
+
+  <h2>How long we keep it</h2>
+  <p>We keep your account data until you delete your account. Verification and reset links expire automatically (7 days and 1 hour respectively).</p>
+
+  <h2>Your rights</h2>
+  <p>You can access, export, or permanently delete your data at any time. If you're signed in on this device, you can do it right here:</p>
+
+  <div class="card">
+    <b>Your data</b>
+    <div class="row">
+      <button class="export" id="exportBtn">Download my data</button>
+      <button class="delete" id="deleteBtn">Delete my account</button>
+    </div>
+    <div class="note" id="note"></div>
+    <div class="muted-box" id="signedout" hidden>You're not signed in on this device. Open a game, sign in, then return here — or email <a href="mailto:team@pacedall.com">team@pacedall.com</a> and we'll handle it.</div>
+  </div>
+
+  <h2>Contact</h2>
+  <p>For any privacy request or question, email <a href="mailto:team@pacedall.com">team@pacedall.com</a>.</p>
+</div>
+
+<script>
+  document.getElementById('date').textContent=new Date().toLocaleDateString('en-GB',{year:'numeric',month:'long',day:'numeric'});
+  function token(){try{return localStorage.getItem('quotid_token')}catch(e){return null}}
+  const note=document.getElementById('note');
+  if(!token()) document.getElementById('signedout').hidden=false;
+
+  document.getElementById('exportBtn').onclick=async()=>{
+    if(!token()){document.getElementById('signedout').hidden=false;return}
+    note.textContent='Preparing your data…';
+    try{
+      const r=await fetch('/api/auth/export',{headers:{Authorization:'Bearer '+token()}});
+      if(!r.ok)throw 0;
+      const blob=await r.blob();
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');a.href=url;a.download='quotid-data.json';a.click();
+      URL.revokeObjectURL(url);
+      note.textContent='Downloaded.';
+    }catch(e){note.textContent='Could not export — please try again or email us.';}
+  };
+
+  document.getElementById('deleteBtn').onclick=async()=>{
+    if(!token()){document.getElementById('signedout').hidden=false;return}
+    if(!confirm('Permanently delete your account and all your streaks? This cannot be undone.'))return;
+    note.textContent='Deleting…';
+    try{
+      const r=await fetch('/api/auth/account',{method:'DELETE',headers:{Authorization:'Bearer '+token()}});
+      if(!r.ok)throw 0;
+      try{localStorage.removeItem('quotid_token')}catch(e){}
+      note.textContent='Your account and data have been deleted.';
+    }catch(e){note.textContent='Could not delete — please try again or email us.';}
+  };
+</script>
+</body>
+</html>

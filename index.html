@@ -3,11 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/png" href="quotid-favicon.png">
+<link rel="icon" type="image/png" href="images/quotid-favicon.png">
 <!-- Start cookieyes banner -->
 <script id="cookieyes" type="text/javascript" src="https://cdn-cookieyes.com/client_data/90fad395248989c1d7f54ba84a823561/script.js"></script>
 <!-- End cookieyes banner -->
 <title>Quotid — a puzzle a day</title>
+<script defer data-domain="quotidgames.com" src="https://plausible.io/js/script.js"></script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -180,7 +182,7 @@
 <div class="wrap">
   <header>
     <div>
-      <div class="logobox"><img class="logo" src="quotid-games-logo.png" alt="Quotid Games"></div>
+      <div class="logobox"><img class="logo" src="images/quotid-games-logo.png" alt="Quotid Games"></div>
       <div class="tag">A puzzle a day · quotidgames.com</div>
       <div class="live"><span class="livedot"></span><b id="liveN">—</b>&nbsp;playing right now</div>
     </div>
@@ -209,7 +211,7 @@
 
   <footer>
     <div class="lat">quotidie — every day</div>
-    <div class="note">Prototype · cards route to /era, /closer, /pinpoint, /ten in production</div>
+    <div class="note"><a href="privacy.html" style="color:inherit">Privacy</a> · Pacedall Labs</div>
   </footer>
 </div>
 
@@ -247,19 +249,20 @@ const Store=(()=>{let mem={};const K='quotid_v1';
 function dstr(off=0){const d=new Date();d.setDate(d.getDate()+off);
   return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 
-// Demo fallback so the hub looks alive when storage is empty/blocked (e.g. in this preview).
-// Once a real player has progress on your domain, that real state is used instead.
+// Demo fallback so the hub looks alive when nobody is signed in.
+// When a real player is signed in (token present), we use their real Era progress instead.
 const TODAY=dstr(0);
+const TOKEN=(()=>{try{return localStorage.getItem('quotid_token')}catch(e){return null}})();
 const DEMO={global:{cur:5,best:5,last:TODAY},daily:{closer:TODAY},
   streaks:{closer:{cur:4,best:4,last:TODAY}},account:null};
-let state=Store.read()||DEMO;
+let state = TOKEN ? {global:{cur:0},daily:{},streaks:{},account:{signedIn:true}} : (Store.read()||DEMO);
 state.daily=state.daily||{}; state.streaks=state.streaks||{}; state.global=state.global||{cur:0};
 
 const GAMES=[
   {key:'era',name:'Era',brain:'Memory',ac:'var(--era)',
    verb:'Read the event, slide the marker to the year it happened.',thumb:'era',fallback:'ready',href:'era.html'},
   {key:'closer',name:'Closer',brain:'Numbers',ac:'var(--closer)',
-   verb:'Home in on a hidden number — warmer, colder, four guesses.',thumb:'closer',fallback:'ready',href:'closer.html'},
+   verb:'Home in on a hidden number — warmer, colder, four guesses.',thumb:'closer',fallback:'ready',href:'#'},
   {key:'pinpoint',name:'Pinpoint',brain:'Places',ac:'var(--pinpoint)',
    verb:'See a place, drop a pin on the map. How close can you get?',thumb:'pinpoint',fallback:'new',href:'#'},
   {key:'ten',name:'Ten',brain:'Logic',ac:'var(--ten)',
@@ -288,36 +291,55 @@ function badge(g){
     <span class="cta">Play <span class="arrow">→</span></span>`;
 }
 
-document.getElementById('grid').innerHTML=GAMES.map(g=>`
-  <a class="card" style="--ac:${g.ac}" href="${g.href}" ${g.href==='#'?'onclick="return false"':''}>
-    <div class="ct">
-      <div><div class="cname">${g.name}</div><div class="cbrain">${g.brain}</div></div>
-      <div class="cverb">${g.verb}</div>
-      <div class="thumb">${thumbHTML(g.thumb)}</div>
-      <div class="state">${badge(g)}</div>
-    </div>
-  </a>`).join('');
+function render(){
+  document.getElementById('grid').innerHTML=GAMES.map(g=>`
+    <a class="card" style="--ac:${g.ac}" href="${g.href}" ${g.href==='#'?'onclick="return false"':''}>
+      <div class="ct">
+        <div><div class="cname">${g.name}</div><div class="cbrain">${g.brain}</div></div>
+        <div class="cverb">${g.verb}</div>
+        <div class="thumb">${thumbHTML(g.thumb)}</div>
+        <div class="state">${badge(g)}</div>
+      </div>
+    </a>`).join('');
 
-// streak + progress
-document.getElementById('streak').textContent=state.global.cur||0;
-const playedCount=GAMES.filter(g=>state.daily[g.key]===TODAY).length;
-document.getElementById('done').textContent=playedCount;
-document.getElementById('bars').innerHTML=GAMES.map(g=>`<div class="bar ${state.daily[g.key]===TODAY?'on':''}"></div>`).join('');
+  document.getElementById('streak').textContent=state.global.cur||0;
+  const playedCount=GAMES.filter(g=>state.daily[g.key]===TODAY).length;
+  document.getElementById('done').textContent=playedCount;
+  document.getElementById('bars').innerHTML=GAMES.map(g=>`<div class="bar ${state.daily[g.key]===TODAY?'on':''}"></div>`).join('');
 
-// date
+  const bar=document.getElementById('savebar');
+  if((state.global.cur||0)>=3 && !state.account){
+    bar.querySelector('.st').innerHTML=`<b>You're on a ${state.global.cur}-day streak.</b> Create a free account to keep it safe across devices and get daily reminders.`;
+    bar.hidden=false;
+  } else { bar.hidden=true; }
+  document.getElementById('sbX').onclick=()=>bar.hidden=true;
+}
+
+// date (independent of progress)
 const now=new Date();
 const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
 document.getElementById('date').childNodes[0].textContent=`${now.getDate()} ${months[now.getMonth()]}`;
 document.getElementById('dow').textContent=days[now.getDay()];
 
-// save banner — only appears once a streak is worth protecting
-const bar=document.getElementById('savebar');
-if((state.global.cur||0)>=3 && !state.account){
-  bar.querySelector('.st').innerHTML=`<b>You're on a ${state.global.cur}-day streak.</b> Create a free account to keep it safe across devices and get daily reminders.`;
-  bar.hidden=false;
+// Pull real Era progress when signed in, then render.
+async function initProgress(){
+  if(TOKEN){
+    try{
+      const r=await fetch('/api/era/me',{headers:{Authorization:'Bearer '+TOKEN}});
+      if(r.ok){
+        const {progress}=await r.json();
+        if(progress){
+          if(progress.playedToday) state.daily.era=TODAY;
+          state.streaks.era={cur:progress.current};
+          state.global.cur=progress.current||0;
+        }
+      }
+    }catch(e){/* fall back to whatever state we have */}
+  }
+  render();
 }
-document.getElementById('sbX').onclick=()=>bar.hidden=true;
+initProgress();
 
 // modal
 function buildModal(){
