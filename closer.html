@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Closer · Quotid</title>
+<link rel="icon" type="image/png" href="quotid-favicon.png">
+<script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('quotid_theme')||'dark')}catch(e){}</script>
+<script defer data-domain="quotidgames.com" src="https://plausible.io/js/script.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#181320;--surface:#241D2E;--surface-2:#2F2738;--paper:#F4EEE6;--muted:#A096AD;
+    --line:rgba(244,238,230,.10);--accent:#C23B2E;--truth:#7BD389;--btnbg:var(--surface-2)}
+  html[data-theme="light"]{--ink:#F6F4EE;--surface:#FFFFFF;--surface-2:#FCFBF7;--paper:#26313F;
+    --muted:#79838B;--line:#E8E3D8;--btnbg:#FFFFFF}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{background:var(--ink);color:var(--paper);font-family:'Nunito',system-ui,sans-serif;
+    font-variant-numeric:tabular-nums;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:18px}
+  .themebtn{position:fixed;top:14px;right:14px;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);
+    background:var(--btnbg);color:var(--paper);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10}
+  .themebtn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .app{width:100%;max-width:440px;display:flex;flex-direction:column;flex:1}
+  .head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:16px}
+  .brand{font-family:'Fredoka';font-weight:700;font-size:30px}.brand .dot{color:var(--accent)}
+  .back{font-family:'Nunito';font-size:12px;color:var(--muted);text-decoration:none;display:block;margin-bottom:3px}
+  .meta{font-family:'Nunito';font-size:12px;color:var(--muted);text-align:right;line-height:1.5}.meta b{color:var(--paper)}
+  .card{background:linear-gradient(180deg,var(--surface-2),var(--surface));border:1px solid var(--line);
+    border-radius:18px;padding:22px 20px;flex:1;display:flex;flex-direction:column}
+  .eyebrow{font-family:'Nunito';font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+  .prompt{font-family:'Fredoka';font-weight:600;font-size:22px;line-height:1.3}
+  .sub{font-size:13px;color:var(--muted);margin-top:6px}.sub b{color:var(--paper)}
+  .guesses{display:flex;flex-direction:column;gap:7px;margin:16px 0 8px}
+  .grow{display:flex;align-items:center;gap:10px;font-family:'Fredoka';font-weight:600}
+  .grow .n{font-size:18px;width:42px}
+  .grow .bar{flex:1;height:9px;border-radius:5px;background:var(--line);overflow:hidden}
+  .grow .bar i{display:block;height:100%;border-radius:5px;background:var(--accent)}
+  .grow .lab{font-family:'Nunito';font-size:12px;font-weight:700;width:74px;text-align:right}
+  .grow .dir{font-size:14px;color:var(--muted);width:54px}
+  .entry{margin-top:auto;text-align:center;font-family:'Fredoka';font-weight:700;font-size:46px;
+    letter-spacing:.04em;min-height:56px;color:var(--accent)}
+  .entry.empty{color:var(--muted)}
+  .pad{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:10px}
+  .key{padding:16px 0;border:1px solid var(--line);border-radius:12px;background:var(--btnbg);color:var(--paper);
+    font-family:'Fredoka';font-weight:600;font-size:21px;cursor:pointer}
+  .key:active{transform:translateY(1px)}
+  .key.enter{background:var(--accent);color:#fff;border-color:transparent}
+  .btn{width:100%;margin-top:14px;padding:15px;border:none;border-radius:13px;font-family:'Fredoka';font-weight:600;
+    font-size:16px;cursor:pointer;background:var(--accent);color:#fff;transition:transform .08s,filter .2s}
+  .btn:hover{filter:brightness(1.06)}.btn:active{transform:translateY(1px)}
+  .btn.ghost{background:transparent;color:var(--paper);border:1px solid var(--line)}
+  .end{text-align:center;padding:8px 4px;margin:auto 0}
+  .end h2{font-family:'Fredoka';font-weight:700;font-size:25px;margin-bottom:4px}
+  .end .big{font-family:'Nunito';font-weight:700;font-size:60px;color:var(--accent);margin:8px 0;line-height:1}
+  .end p{color:var(--muted);font-size:14px;line-height:1.5}
+  .streakline{font-family:'Nunito';font-weight:700;font-size:15px;color:var(--accent);margin-top:16px}
+</style>
+</head>
+<body>
+<button class="themebtn" id="themeBtn" aria-label="Switch theme"></button>
+<div class="app">
+  <div class="head">
+    <div><a class="back" href="index.html">← Quotid</a><div class="brand">Closer<span class="dot">.</span></div></div>
+    <div class="meta" id="meta">GUESSES<br><b id="left">4</b> left</div>
+  </div>
+  <div class="card" id="card"></div>
+  <div class="hint" id="hint"></div>
+</div>
+<script>
+/* ---- theme ---- */
+const SUN='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/></svg>';
+const MOON='<svg viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1111.2 3a6.6 6.6 0 009.8 9.8z"/></svg>';
+const themeBtn=document.getElementById('themeBtn');
+function setTheme(t){document.documentElement.setAttribute('data-theme',t);themeBtn.innerHTML=t==='dark'?SUN:MOON;try{localStorage.setItem('quotid_theme',t)}catch(e){}}
+(function(){let t;try{t=localStorage.getItem('quotid_theme')}catch(e){}setTheme(t||'dark')})();
+themeBtn.onclick=()=>setTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');
+
+/* ---- daily seed + shared state (read by the hub) ---- */
+function dstr(o=0){const d=new Date();d.setDate(d.getDate()+o);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function hashStr(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const State=(()=>{let mem={};const K='quotid_v1';return{read(){try{const r=localStorage.getItem(K);return r?JSON.parse(r):null}catch(e){return mem[K]||null}},write(o){try{localStorage.setItem(K,JSON.stringify(o))}catch(e){mem[K]=o}}}})();
+function loadState(){return State.read()||{daily:{},streaks:{},global:{cur:0,best:0,last:null},account:null}}
+function recordLocalPlay(key){const s=loadState(),t=dstr(0),y=dstr(-1);
+  if(s.daily[key]===t)return s;
+  const gs=s.streaks[key]||{cur:0,best:0,last:null};
+  gs.cur=(gs.last===y)?gs.cur+1:1;gs.best=Math.max(gs.best,gs.cur);gs.last=t;s.streaks[key]=gs;
+  if(s.global.last!==t){s.global.cur=(s.global.last===y)?s.global.cur+1:1;s.global.last=t}
+  s.daily[key]=t;State.write(s);return s}
+function streakOf(key){const s=loadState();return (s.streaks[key]&&s.streaks[key].cur)||0}
+
+/* ---- Closer ---- */
+const KEY='closer', MAXG=4;
+const card=document.getElementById('card'), hint=document.getElementById('hint');
+let target=0, left=MAXG, entry='', history=[], daily=true, over=false;
+
+function warmth(d){d=Math.abs(d);
+  if(d===0)return['Bullseye',1];
+  if(d<=2)return['Boiling',.95];
+  if(d<=5)return['Hot',.82];
+  if(d<=10)return['Warm',.64];
+  if(d<=20)return['Cool',.44];
+  if(d<=35)return['Cold',.24];
+  return['Freezing',.1]}
+
+function newTarget(isDaily){
+  daily=isDaily; over=false; left=MAXG; entry=''; history=[];
+  target = isDaily ? 1+Math.floor(mulberry32(hashStr('closer-'+dstr()))()*100)
+                   : 1+Math.floor(Math.random()*100);
+  document.getElementById('left').textContent=left;
+  render();
+}
+function render(){
+  const rows=history.map(h=>{const[w,f]=warmth(h.d);
+    return `<div class="grow"><span class="n">${h.g}</span>
+      <span class="dir">${h.d>0?'↑ higher':h.d<0?'↓ lower':'✓ exact'}</span>
+      <span class="bar"><i style="width:${Math.round(f*100)}%"></i></span>
+      <span class="lab">${w}</span></div>`}).join('');
+  card.innerHTML=`
+    <div class="eyebrow">${daily?'Today · Numbers':'Practice · Numbers'}</div>
+    <div class="prompt">I'm thinking of a number from 1 to 100.</div>
+    <div class="sub"><b id="left2">${left}</b> guess${left===1?'':'es'} left · warmer means closer</div>
+    <div class="guesses">${rows}</div>
+    <div class="entry ${entry?'':'empty'}" id="entry">${entry||'·'}</div>
+    <div class="pad" id="pad"></div>`;
+  const pad=document.getElementById('pad');
+  ['1','2','3','4','5','6','7','8','9','⌫','0','↵'].forEach(k=>{
+    const b=document.createElement('button');b.className='key'+(k==='↵'?' enter':'');b.textContent=k;
+    b.onclick=()=>press(k);pad.appendChild(b);});
+}
+function press(k){
+  if(over)return;
+  if(k==='⌫'){entry=entry.slice(0,-1);}
+  else if(k==='↵'){submit();return;}
+  else{const n=parseInt(entry+k,10);if(n>=1&&n<=100)entry=String(n);}
+  const e=document.getElementById('entry');if(e){e.textContent=entry||'·';e.classList.toggle('empty',!entry);}
+}
+function submit(){
+  const g=parseInt(entry,10);
+  if(!(g>=1&&g<=100)){hint.textContent='Pick a number from 1 to 100.';return;}
+  hint.textContent='';
+  const d=target-g; history.push({g,d}); left--; entry='';
+  document.getElementById('left').textContent=left;
+  if(g===target){end(true);return;}
+  if(left<=0){end(false);return;}
+  render();
+}
+function end(solved){
+  over=true;
+  let prog=null; if(daily) prog=recordLocalPlay(KEY);
+  const streak = prog ? (prog.streaks[KEY].cur) : streakOf(KEY);
+  const sline = daily?`<div class="streakline">🔥 ${streak} day streak</div>`:'';
+  const used=history.length;
+  if(solved){
+    card.innerHTML=`<div class="end"><div class="eyebrow">${daily?'Today · Numbers':'Practice'}</div>
+      <h2>Got it!</h2><div class="big">${used}</div>
+      <p>You found <b style="color:var(--paper)">${target}</b> in ${used} guess${used===1?'':'es'}.</p>
+      ${sline}
+      <button class="btn" id="prac" style="margin-top:18px">Practice round</button>
+      <button class="btn ghost" id="home">Back to Quotid</button></div>`;
+  } else {
+    const best=history.reduce((m,h)=>Math.min(m,Math.abs(h.d)),99);
+    card.innerHTML=`<div class="end"><div class="eyebrow">${daily?'Today · Numbers':'Practice'}</div>
+      <h2>So close.</h2><div class="big">${target}</div>
+      <p>That was the number. Your nearest guess was ${best} away.</p>
+      ${sline}
+      <button class="btn" id="prac" style="margin-top:18px">Practice round</button>
+      <button class="btn ghost" id="home">Back to Quotid</button></div>`;
+  }
+  document.getElementById('prac').onclick=()=>{newTarget(false);hint.textContent='Practice — doesn\u2019t affect your streak.';};
+  document.getElementById('home').onclick=()=>location.href='index.html';
+}
+function alreadyToday(){
+  card.innerHTML=`<div class="end"><div class="eyebrow">Today · Numbers</div>
+    <h2>Done for today.</h2>
+    <p>You've already played today's Closer. A new number lands tomorrow.</p>
+    <div class="streakline">🔥 ${streakOf(KEY)} day streak</div>
+    <button class="btn" id="prac" style="margin-top:18px">Practice round</button>
+    <button class="btn ghost" id="home">Back to Quotid</button></div>`;
+  document.getElementById('left').textContent='—';
+  document.getElementById('prac').onclick=()=>{newTarget(false);hint.textContent='Practice — doesn\u2019t affect your streak.';};
+  document.getElementById('home').onclick=()=>location.href='index.html';
+}
+// boot
+if(loadState().daily[KEY]===dstr()) alreadyToday(); else newTarget(true);
+</script>
+</body>
+</html>

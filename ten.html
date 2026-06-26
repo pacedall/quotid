@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Ten · Quotid</title>
+<link rel="icon" type="image/png" href="quotid-favicon.png">
+<script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('quotid_theme')||'dark')}catch(e){}</script>
+<script defer data-domain="quotidgames.com" src="https://plausible.io/js/script.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#181320;--surface:#241D2E;--surface-2:#2F2738;--paper:#F4EEE6;--muted:#A096AD;
+    --line:rgba(244,238,230,.10);--accent:#D99A3C;--truth:#7BD389;--btnbg:var(--surface-2)}
+  html[data-theme="light"]{--ink:#F6F4EE;--surface:#FFFFFF;--surface-2:#FCFBF7;--paper:#26313F;
+    --muted:#79838B;--line:#E8E3D8;--btnbg:#FFFFFF}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{background:var(--ink);color:var(--paper);font-family:'Nunito',system-ui,sans-serif;
+    font-variant-numeric:tabular-nums;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:18px}
+  .themebtn{position:fixed;top:14px;right:14px;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);
+    background:var(--btnbg);color:var(--paper);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10}
+  .themebtn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .app{width:100%;max-width:440px;display:flex;flex-direction:column;flex:1}
+  .head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:16px}
+  .brand{font-family:'Fredoka';font-weight:700;font-size:30px}.brand .dot{color:var(--accent)}
+  .back{font-family:'Nunito';font-size:12px;color:var(--muted);text-decoration:none;display:block;margin-bottom:3px}
+  .meta{font-family:'Nunito';font-size:12px;color:var(--muted);text-align:right;line-height:1.5}.meta b{color:var(--paper)}
+  .card{background:linear-gradient(180deg,var(--surface-2),var(--surface));border:1px solid var(--line);
+    border-radius:18px;padding:22px 20px;flex:1;display:flex;flex-direction:column}
+  .eyebrow{font-family:'Nunito';font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+  .target{text-align:center;margin-bottom:6px}
+  .target .lab{font-family:'Nunito';font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+  .target .val{font-family:'Fredoka';font-weight:700;font-size:58px;color:var(--accent);line-height:1.05}
+  .tiles{display:flex;flex-wrap:wrap;gap:11px;justify-content:center;margin:18px 0;min-height:64px}
+  .tile{width:62px;height:62px;border-radius:14px;border:1px solid var(--line);background:var(--btnbg);color:var(--paper);
+    font-family:'Fredoka';font-weight:700;font-size:25px;cursor:pointer;transition:transform .08s,border-color .12s,background .12s}
+  .tile:active{transform:scale(.95)}
+  .tile.sel{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 22%,var(--btnbg));color:var(--paper)}
+  .tile.win{border-color:var(--truth);background:color-mix(in srgb,var(--truth) 26%,var(--btnbg))}
+  .ops{display:flex;gap:10px;justify-content:center;margin-bottom:6px}
+  .op{width:58px;height:52px;border-radius:12px;border:1px solid var(--line);background:var(--btnbg);color:var(--paper);
+    font-family:'Fredoka';font-weight:600;font-size:24px;cursor:pointer}
+  .op.sel{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 24%,var(--btnbg))}
+  .ctrlrow{display:flex;gap:10px;margin-top:auto}
+  .btn{flex:1;padding:14px;border:none;border-radius:13px;font-family:'Fredoka';font-weight:600;font-size:16px;cursor:pointer;
+    background:var(--accent);color:#3a2606;transition:transform .08s,filter .2s}
+  .btn:hover{filter:brightness(1.06)}.btn:active{transform:translateY(1px)}.btn:disabled{opacity:.4}
+  .btn.ghost{background:transparent;color:var(--paper);border:1px solid var(--line)}
+  .end{text-align:center;padding:8px 4px;margin:auto 0}
+  .end h2{font-family:'Fredoka';font-weight:700;font-size:25px;margin-bottom:4px}
+  .end .big{font-family:'Nunito';font-weight:700;font-size:60px;color:var(--accent);margin:8px 0;line-height:1}
+  .end p{color:var(--muted);font-size:14px;line-height:1.5}
+  .streakline{font-family:'Nunito';font-weight:700;font-size:15px;color:var(--accent);margin-top:16px}
+  .hint{text-align:center;font-size:12px;color:var(--muted);margin-top:12px;min-height:16px}
+</style>
+</head>
+<body>
+<button class="themebtn" id="themeBtn" aria-label="Switch theme"></button>
+<div class="app">
+  <div class="head">
+    <div><a class="back" href="index.html">← Quotid</a><div class="brand">Ten<span class="dot">.</span></div></div>
+    <div class="meta">MAKE THE<br><b id="tnum">—</b></div>
+  </div>
+  <div class="card" id="card"></div>
+  <div class="hint" id="hint">Tap a number, an operation, then another number.</div>
+</div>
+<script>
+/* theme */
+const SUN='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/></svg>';
+const MOON='<svg viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1111.2 3a6.6 6.6 0 009.8 9.8z"/></svg>';
+const themeBtn=document.getElementById('themeBtn');
+function setTheme(t){document.documentElement.setAttribute('data-theme',t);themeBtn.innerHTML=t==='dark'?SUN:MOON;try{localStorage.setItem('quotid_theme',t)}catch(e){}}
+(function(){let t;try{t=localStorage.getItem('quotid_theme')}catch(e){}setTheme(t||'dark')})();
+themeBtn.onclick=()=>setTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');
+
+/* daily + state */
+function dstr(o=0){const d=new Date();d.setDate(d.getDate()+o);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function hashStr(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const State=(()=>{let mem={};const K='quotid_v1';return{read(){try{const r=localStorage.getItem(K);return r?JSON.parse(r):null}catch(e){return mem[K]||null}},write(o){try{localStorage.setItem(K,JSON.stringify(o))}catch(e){mem[K]=o}}}})();
+function loadState(){return State.read()||{daily:{},streaks:{},global:{cur:0,best:0,last:null},account:null}}
+function recordLocalPlay(key){const s=loadState(),t=dstr(0),y=dstr(-1);
+  if(s.daily[key]===t)return s;
+  const gs=s.streaks[key]||{cur:0,best:0,last:null};
+  gs.cur=(gs.last===y)?gs.cur+1:1;gs.best=Math.max(gs.best,gs.cur);gs.last=t;s.streaks[key]=gs;
+  if(s.global.last!==t){s.global.cur=(s.global.last===y)?s.global.cur+1:1;s.global.last=t}
+  s.daily[key]=t;State.write(s);return s}
+function streakOf(key){const s=loadState();return (s.streaks[key]&&s.streaks[key].cur)||0}
+
+/* puzzle generation — guaranteed solvable by construction */
+function genPuzzle(isDaily){
+  const rnd=isDaily?mulberry32(hashStr('ten-'+dstr())):Math.random;
+  const pool=[1,2,3,4,5,6,7,8,9,10,12,15,20,25];
+  for(let a=0;a<80;a++){
+    const nums=[];for(let i=0;i<5;i++)nums.push(pool[Math.floor(rnd()*pool.length)]);
+    let vals=nums.slice();
+    while(vals.length>1){
+      let i=Math.floor(rnd()*vals.length),j=Math.floor(rnd()*vals.length);if(j===i)j=(j+1)%vals.length;
+      let x=vals[i],y=vals[j];if(x<y){const t=x;x=y;y=t}
+      let op=['+','-','*','/'][Math.floor(rnd()*4)];
+      if(op==='/'&&(y===0||x%y!==0))op='+';
+      if(op==='-'&&x-y<=0)op='+';
+      const r=op==='+'?x+y:op==='-'?x-y:op==='*'?x*y:x/y;
+      vals=vals.filter((_,k)=>k!==i&&k!==j);vals.push(r);
+    }
+    const target=vals[0];
+    if(Number.isInteger(target)&&target>=12&&target<=80&&!nums.includes(target))return{nums,target};
+  }
+  return{nums:[3,5,7,8,10],target:24};
+}
+
+/* game */
+const KEY='ten';
+const card=document.getElementById('card'), hint=document.getElementById('hint');
+let target=0, tiles=[], origin=[], sel=null, op=null, undo=[], uid=0, daily=true, won=false;
+
+function start(isDaily){
+  daily=isDaily; won=false; undo=[]; sel=null; op=null;
+  const p=genPuzzle(isDaily); target=p.target;
+  origin=p.nums.slice();
+  tiles=p.nums.map(v=>({id:++uid,val:v}));
+  document.getElementById('tnum').textContent=target;
+  hint.textContent='Tap a number, an operation, then another number.';
+  render();
+}
+function render(){
+  const tileHtml=tiles.map(t=>`<button class="tile ${sel===t.id?'sel':''} ${t.val===target&&tiles.length===1?'win':''}" data-id="${t.id}">${t.val}</button>`).join('');
+  card.innerHTML=`
+    <div class="eyebrow">${daily?'Today · Logic':'Practice · Logic'}</div>
+    <div class="target"><div class="lab">Target</div><div class="val">${target}</div></div>
+    <div class="tiles">${tileHtml}</div>
+    <div class="ops">
+      ${['+','−','×','÷'].map(o=>`<button class="op ${op===o?'sel':''}" data-op="${o}">${o}</button>`).join('')}
+    </div>
+    <div class="ctrlrow">
+      <button class="btn ghost" id="undo" ${undo.length?'':'disabled'}>Undo</button>
+      <button class="btn ghost" id="reset">Reset</button>
+    </div>`;
+  card.querySelectorAll('.tile').forEach(b=>b.onclick=()=>tapTile(+b.dataset.id));
+  card.querySelectorAll('.op').forEach(b=>b.onclick=()=>tapOp(b.dataset.op));
+  document.getElementById('undo').onclick=doUndo;
+  document.getElementById('reset').onclick=()=>{tiles=origin.map(v=>({id:++uid,val:v}));undo=[];sel=null;op=null;hint.textContent='Back to the start.';render();};
+}
+function tapTile(id){
+  if(won)return;
+  if(sel===null){sel=id;op=null;render();return;}
+  if(sel===id){sel=null;op=null;render();return;}
+  if(op===null){sel=id;render();return;} // re-pick first number
+  // second number chosen → combine
+  const A=tiles.find(t=>t.id===sel), B=tiles.find(t=>t.id===id);
+  const a=A.val,b=B.val; let r,bad=null;
+  if(op==='+')r=a+b;
+  else if(op==='−'){r=a-b; if(r<=0)bad='That would drop to zero or below — try the other number first.';}
+  else if(op==='×')r=a*b;
+  else { if(b===0||a%b!==0)bad='÷ only works when it divides evenly.'; else r=a/b; }
+  if(bad){hint.textContent=bad;op=null;render();return;}
+  undo.push(tiles.map(t=>({id:t.id,val:t.val})));
+  tiles=tiles.filter(t=>t.id!==A.id&&t.id!==B.id);
+  tiles.push({id:++uid,val:r});
+  sel=null;op=null;
+  if(r===target&&tiles.length===1){won=true;render();setTimeout(()=>end(true),450);return;}
+  hint.textContent = tiles.length===1 ? `That leaves ${r}. Reset to try again, or you got it!` : 'Keep going.';
+  render();
+}
+function tapOp(o){ if(won)return; if(sel===null){hint.textContent='Pick a number first.';return;} op=o; render(); }
+function doUndo(){ if(!undo.length)return; tiles=undo.pop(); sel=null;op=null; render(); }
+function end(solved){
+  let prog=null; if(daily) prog=recordLocalPlay(KEY);
+  const streak=prog?prog.streaks[KEY].cur:streakOf(KEY);
+  const sline=daily?`<div class="streakline">🔥 ${streak} day streak</div>`:'';
+  card.innerHTML=`<div class="end"><div class="eyebrow">${daily?'Today · Logic':'Practice'}</div>
+    <h2>Solved.</h2><div class="big">${target}</div>
+    <p>Nicely done — you built the target from the numbers.</p>
+    ${sline}
+    <button class="btn" id="prac" style="margin-top:18px">Practice puzzle</button>
+    <button class="btn ghost" id="home">Back to Quotid</button></div>`;
+  document.getElementById('prac').onclick=()=>{start(false);hint.textContent='Practice — doesn\u2019t affect your streak.';};
+  document.getElementById('home').onclick=()=>location.href='index.html';
+}
+function alreadyToday(){
+  document.getElementById('tnum').textContent='✓';
+  card.innerHTML=`<div class="end"><div class="eyebrow">Today · Logic</div>
+    <h2>Done for today.</h2>
+    <p>You've solved today's Ten. A fresh target lands tomorrow.</p>
+    <div class="streakline">🔥 ${streakOf(KEY)} day streak</div>
+    <button class="btn" id="prac" style="margin-top:18px">Practice puzzle</button>
+    <button class="btn ghost" id="home">Back to Quotid</button></div>`;
+  document.getElementById('prac').onclick=()=>{start(false);hint.textContent='Practice — doesn\u2019t affect your streak.';};
+  document.getElementById('home').onclick=()=>location.href='index.html';
+}
+if(loadState().daily[KEY]===dstr()) alreadyToday(); else start(true);
+</script>
+</body>
+</html>

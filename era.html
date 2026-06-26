@@ -178,7 +178,7 @@ function recordLocalPlay(){const s=loadState(),t=dstr(0),y=dstr(-1);
   if(s.daily.era===t)return s;
   const gs=s.streaks.era||{cur:0,best:0,last:null};
   gs.cur=(gs.last===y)?gs.cur+1:1; gs.best=Math.max(gs.best,gs.cur); gs.last=t; s.streaks.era=gs;
-  s.global.cur=(s.global.last===y)?s.global.cur+1:1; s.global.last=t;
+  if(s.global.last!==t){s.global.cur=(s.global.last===y)?s.global.cur+1:1; s.global.last=t;}
   s.daily.era=t; State.write(s); return s}
 
 /* ---------- API ---------- */
